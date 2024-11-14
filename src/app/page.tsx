@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface ObjType {
     type: "Fruit" | "Vegetable";
@@ -53,14 +53,7 @@ export default function Home() {
             name: "Carrot",
         },
     ];
-
-    const [items, setItems] = useState<ObjType[]>([]);
-
-    useEffect(() => {
-        // Initialize state on the client only
-        setItems(initialData);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    const [items, setItems] = useState<ObjType[]>(initialData);
 
     const [movedItems, setMovedItems] = useState<{
         Fruit: ObjType[];
@@ -87,6 +80,15 @@ export default function Home() {
         }, 5000);
     };
 
+    const sendBack = (item: ObjType) => {
+        // Immediately move the item back to the left container
+        setMovedItems((prevMoved) => ({
+            ...prevMoved,
+            [item.type]: prevMoved[item.type].filter((block) => block !== item),
+        }));
+        setItems((prevItems) => [...prevItems, item]);
+    };
+
     return (
         <div className="grid grid-cols-3 w-100 h-screen gap-4 p-4">
             {/* Items List */}
@@ -108,6 +110,7 @@ export default function Home() {
                 {movedItems.Fruit.map((item, index) => (
                     <div
                         key={index}
+                        onClick={() => sendBack(item)}
                         className="pointer-curser mb-4 mx-2 border-2 py-4 border-solid border-gray-400 text-center"
                     >
                         {item.name}
@@ -123,6 +126,7 @@ export default function Home() {
                 {movedItems.Vegetable.map((item, index) => (
                     <div
                         key={index}
+                        onClick={() => sendBack(item)}
                         className="pointer-curser mb-4 mx-2 border-2 py-4 border-solid border-gray-400 text-center"
                     >
                         {item.name}
